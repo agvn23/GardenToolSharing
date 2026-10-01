@@ -1,0 +1,28 @@
+# .NET build output
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+# SQLite database files (created at runtime, not source)
+*.db
+*.db-shm
+*.db-wal
+
+# Secrets - never commit real values, only the .example file
+.env
+.env.*
+!.env.example
+
+# Frontend (Vite/React) - relevant once that project exists alongside this one
+node_modules/
+dist/
+.vite/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.idea/
+
+tools.db*

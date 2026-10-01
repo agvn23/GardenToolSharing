@@ -1,0 +1,17 @@
+services:
+  api:
+    build:
+      context: ./GardenToolSharing.Api
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__Default: Data Source=/data/tools.db
+      Jwt__Key: ${JWT_KEY}
+      Jwt__Issuer: GardenToolSharing
+      Jwt__Audience: GardenToolSharing
+    volumes:
+      - tools-data:/data
+
+volumes:
+  tools-data:
