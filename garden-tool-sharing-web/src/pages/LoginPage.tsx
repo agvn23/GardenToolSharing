@@ -1,10 +1,10 @@
 import { useState, type CSSProperties, type FormEvent } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ApiError } from '../utils/problemDetails';
 
 export function LoginPage() {
-  const { login } = useAuth();
+  const { login, user, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? '/';
@@ -30,6 +30,9 @@ export function LoginPage() {
       setIsSubmitting(false);
     }
   }
+
+if (isLoading) return null;
+if (user) return <Navigate to={from} replace />;
 
   return (
     <div style={styles.page}>
