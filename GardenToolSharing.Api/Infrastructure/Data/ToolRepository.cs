@@ -39,7 +39,7 @@ public class ToolRepository(AppDbContext db) : IToolRepository
         {
             query = query.Where(t =>
                 t.OwnerId == userId ||
-                t.Memberships.Any(m => m.UserId == userId && m.Status == MembershipStatus.Active));
+                t.Loans.Any(l => l.BorrowerId == userId && l.ReturnedAt == null));
         }
 
         return await query
