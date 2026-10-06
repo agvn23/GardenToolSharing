@@ -22,11 +22,14 @@ export function RootLayout() {
           fontFamily: 'system-ui, sans-serif',
         }}
       >
-        <nav>
+        <nav style={{ display: 'flex', gap: '1rem' }}>
           <Link to="/tools" style={{ color: '#fff', textDecoration: 'none', fontWeight: 600 }}>
             Tools
           </Link>
-        </nav>
+          <Link to="/leaderboard" style={{ color: '#fff', textDecoration: 'none', fontWeight: 600 }}>
+            Leaderboard
+          </Link>
+          </nav>
         <button
           onClick={handleLogout}
           style={{
