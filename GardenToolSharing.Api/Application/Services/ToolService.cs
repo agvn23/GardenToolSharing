@@ -33,14 +33,14 @@ public class ToolService(IToolRepository tools, TimeProvider time) : IToolServic
         // Reload so the Owner navigation is populated for the response
         var created = await tools.FindVisibleToAsync(tool.Id, ownerId, ct)
                       ?? throw new InvalidOperationException("Created tool could not be reloaded.");
-        return ToDto(created);
+        return ToDto(created, ownerId);
     }
 
     public async Task<IReadOnlyList<ToolDto>> ListAsync(
         int userId, ToolVisibility? visibility, ToolStatus? status, bool mineOnly, CancellationToken ct)
     {
         var list = await tools.ListVisibleToAsync(userId, visibility, status, mineOnly, ct);
-        return list.Select(ToDto).ToList();
+        return list.Select(t => ToDto(t, userId)).ToList();
     }
 
     public async Task<ToolDto> GetAsync(int userId, int toolId, CancellationToken ct)
@@ -48,10 +48,18 @@ public class ToolService(IToolRepository tools, TimeProvider time) : IToolServic
         // Private tools the user has no relation to look exactly like tools that don't exist
         var tool = await tools.FindVisibleToAsync(toolId, userId, ct)
                    ?? throw new NotFoundException("Tool not found.");
-        return ToDto(tool);
+        return ToDto(tool, userId);
     }
 
-    private static ToolDto ToDto(Tool t) => new(
+private static ToolDto ToDto(Tool t, int viewerId)
+{
+    var activeLoan = t.Loans.FirstOrDefault(l => l.ReturnedAt == null);
+    var canSeeBorrower = activeLoan is not null
+        && (t.OwnerId == viewerId || activeLoan.BorrowerId == viewerId);
+
+    return new ToolDto(
         t.Id, t.Name, t.Description, t.Visibility, t.Status,
-        t.AvailableFrom, t.AvailableUntil, t.OwnerId, t.Owner.DisplayName, t.CreatedAt);
+        t.AvailableFrom, t.AvailableUntil, t.OwnerId, t.Owner.DisplayName, t.CreatedAt,
+        canSeeBorrower ? activeLoan!.Borrower.DisplayName : null);
+}
 }

@@ -14,6 +14,7 @@ export interface Tool {
   ownerId: number;
   ownerName: string;
   createdAt: string;      // ISO date-time
+  borrowerName: string | null;
 }
 
 export function getTools(options: { mine?: boolean } = {}): Promise<Tool[]> {

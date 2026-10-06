@@ -38,13 +38,14 @@ export function ToolsPage() {
       {error && <p role="alert">{error}</p>}
       {!error && !tools && <p>Loading tools…</p>}
       {!error && tools && tools.length === 0 && (
-        <p>{mine ? "You haven't added any tools yet." : 'No tools to show yet.'}</p>
+        <p>{mine ? "You don't own or borrow any tools yet." : 'No tools to show yet.'}</p>
       )}
       {!error && tools && tools.length > 0 && (
         <ul>
           {tools.map((tool) => (
             <li key={tool.id}>
-              <strong>{tool.name}</strong> ({tool.status}) owned by {tool.ownerName}
+              <strong>{tool.name}</strong> ({tool.status === 'Lent' ? 'Borrowed' : 'Available'}
+                {tool.borrowerName && ` by ${tool.borrowerName}`}) owned by {tool.ownerName}    
               <br />
               Available {tool.availableFrom} to {tool.availableUntil}
               {tool.description && <p>{tool.description}</p>}
