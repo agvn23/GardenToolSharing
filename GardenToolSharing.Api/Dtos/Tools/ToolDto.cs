@@ -12,4 +12,5 @@ public record ToolDto(
     DateOnly AvailableUntil,
     int OwnerId,
     string OwnerName,
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    string? BorrowerName = null);

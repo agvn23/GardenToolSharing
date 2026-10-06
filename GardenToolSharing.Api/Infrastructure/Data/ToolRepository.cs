@@ -22,6 +22,7 @@ public class ToolRepository(AppDbContext db) : IToolRepository
         VisibleTo(userId)
             .AsNoTracking()
             .Include(t => t.Owner)
+            .Include(t => t.Loans.Where(l => l.ReturnedAt == null)).ThenInclude(l => l.Borrower)
             .FirstOrDefaultAsync(t => t.Id == toolId, ct);
 
     public async Task<IReadOnlyList<Tool>> ListVisibleToAsync(
@@ -39,12 +40,13 @@ public class ToolRepository(AppDbContext db) : IToolRepository
         {
             query = query.Where(t =>
                 t.OwnerId == userId ||
-                t.Memberships.Any(m => m.UserId == userId && m.Status == MembershipStatus.Active));
+                t.Loans.Any(l => l.BorrowerId == userId && l.ReturnedAt == null));
         }
 
         return await query
             .AsNoTracking()
             .Include(t => t.Owner)
+            .Include(t => t.Loans.Where(l => l.ReturnedAt == null)).ThenInclude(l => l.Borrower)
             .OrderBy(t => t.Name)
             .ThenBy(t => t.Id)
             .ToListAsync(ct);
