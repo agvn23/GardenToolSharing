@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getTools, type Tool } from '../data/tools'; // keep the path you already use
+import { Link } from 'react-router-dom';
 
 export function ToolsPage() {
   const [mine, setMine] = useState(false);
@@ -26,6 +27,7 @@ export function ToolsPage() {
     <section>
       <h1>Tools</h1>
 
+      <p><Link to="/tools/new">Add a tool</Link></p>
       <label style={{ display: 'inline-flex', gap: '0.5rem', alignItems: 'center' }}>
         <input
           type="checkbox"
