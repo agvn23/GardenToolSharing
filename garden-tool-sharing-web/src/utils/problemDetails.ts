@@ -40,3 +40,13 @@ export async function parseApiError(response: Response): Promise<ApiError> {
     body?.errors,
   );
 }
+
+export function errorMessage(err: unknown): string {
+  if (err instanceof ApiError) {
+    const fieldMessages = err.fieldErrors ? Object.values(err.fieldErrors).flat() : [];
+    if (fieldMessages.length > 0) return fieldMessages.join(' ');
+    if (err.status === 429) return 'Too many requests. Please wait a minute and try again.';
+    return err.message;
+  }
+  return 'Something went wrong. Please try again.';
+}
