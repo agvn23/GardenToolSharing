@@ -20,3 +20,15 @@ export interface Tool {
 export function getTools(options: { mine?: boolean } = {}): Promise<Tool[]> {
   return apiFetch<Tool[]>(`/tools${options.mine ? '?mine=true' : ''}`);
 }
+
+export interface CreateToolInput {
+  name: string;
+  description?: string;
+  visibility: ToolVisibility;
+  availableFrom: string;  // 'YYYY-MM-DD'
+  availableUntil: string;
+}
+
+export function createTool(input: CreateToolInput): Promise<Tool> {
+  return apiFetch<Tool>('/tools', { method: 'POST', body: input });
+}

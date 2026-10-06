@@ -3,6 +3,7 @@ import { AuthGuard } from './layouts/AuthGuard';
 import { RootLayout } from './layouts/RootLayout';
 import { LoginPage } from './pages/LoginPage';
 import { ToolsPage } from './pages/ToolsPage';
+import { NewToolPage } from './pages/NewToolPage';
 
 
 // Temporary stand-in for "/" until the Dashboard slice replaces it - proves the full
@@ -17,6 +18,7 @@ export function App() {
         <Route element={<RootLayout />}>
           <Route path="/" element={<Navigate to="/tools" replace />} />
           <Route path="/tools" element={<ToolsPage />} />
+          <Route path="/tools/new" element={<NewToolPage />} />
         </Route>
       </Route>
       <Route path="*" element={<Navigate to="/tools" replace />} />
