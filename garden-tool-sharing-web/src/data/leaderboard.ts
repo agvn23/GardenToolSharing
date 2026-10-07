@@ -5,6 +5,7 @@ export interface LeaderboardEntry {
   ownerId: number;
   ownerName: string;
   totalLoans: number;
+  activeLoans: number;
 }
 
 export function getLeaderboard(period?: string): Promise<LeaderboardEntry[]> {

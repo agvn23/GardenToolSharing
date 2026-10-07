@@ -20,7 +20,7 @@ export function LeaderboardPage() {
     <section>
       <h1>Top lenders</h1>
       <p style={{ color: '#555' }}>
-        Ranked by the number of times each person's tools have been lent out.
+        Ranked by tools currently on loan, then by total loans ever made.
       </p>
 
       {error && <p role="alert">{error}</p>}
@@ -30,9 +30,10 @@ export function LeaderboardPage() {
         <table style={{ borderCollapse: 'collapse', minWidth: '300px' }}>
           <thead>
             <tr>
-              <th style={cell}>Rank</th>
-              <th style={{ ...cell, textAlign: 'left' }}>Lender</th>
-              <th style={cell}>Loans</th>
+                <th style={cell}>Rank</th>
+                <th style={{ ...cell, textAlign: 'left' }}>Lender</th>
+                <th style={cell}>On loan now</th>
+                <th style={cell}>Total loans</th>
             </tr>
           </thead>
           <tbody>
@@ -44,6 +45,7 @@ export function LeaderboardPage() {
                   <td style={{ ...cell, textAlign: 'left' }}>
                     {entry.ownerName}{isMe && ' (you)'}
                   </td>
+                  <td style={cell}>{entry.activeLoans}</td>
                   <td style={cell}>{entry.totalLoans}</td>
                 </tr>
               );
