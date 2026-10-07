@@ -39,6 +39,7 @@ public static class MembershipEndpoints
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status409Conflict);
 
+        // Members leave (or cancel their own request); a tool's owner can also use this to decline a pending request.
         group.MapDelete("/{id:int}", async (
                 int id, ClaimsPrincipal user, IMembershipService memberships, CancellationToken ct) =>
             {

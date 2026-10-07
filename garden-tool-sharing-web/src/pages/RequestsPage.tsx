@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { approveMembership, getPendingRequests, type Membership } from '../data/memberships';
+import { approveMembership, declineMembership, getPendingRequests, type Membership } from '../data/memberships';
 import { errorMessage } from '../utils/problemDetails';
 
 export function RequestsPage() {
@@ -17,15 +17,29 @@ export function RequestsPage() {
   }, []);
 
   async function handleApprove(request: Membership) {
+  setActionError(null);
+  setBusyId(request.id);
+  try {
+    await approveMembership(request.id);
+    setRequests((current) => current?.filter((r) => r.id !== request.id) ?? null);
+  } catch (err) {
+    setActionError(errorMessage(err));
+  } finally {
+    setBusyId(null);
+  }
+}
+
+  async function handleDecline(request: Membership) {
+    if (!window.confirm(`Decline ${request.userDisplayName}'s request for ${request.toolName}?`)) return;
     setActionError(null);
     setBusyId(request.id);
     try {
-      await approveMembership(request.id);
-      setRequests((current) => current?.filter((r) => r.id !== request.id) ?? null);
+        await declineMembership(request.id);
+        setRequests((current) => current?.filter((r) => r.id !== request.id) ?? null);
     } catch (err) {
-      setActionError(errorMessage(err));
+        setActionError(errorMessage(err));
     } finally {
-      setBusyId(null);
+        setBusyId(null);
     }
   }
 
@@ -46,7 +60,10 @@ export function RequestsPage() {
               <br />
               Requested {new Date(request.createdAt).toLocaleDateString()}{' '}
               <button onClick={() => handleApprove(request)} disabled={busyId === request.id}>
-                {busyId === request.id ? 'Approving…' : 'Approve'}
+                {busyId === request.id ? 'Working…' : 'Approve'}
+              </button>{' '}
+              <button onClick={() => handleDecline(request)} disabled={busyId === request.id}>
+                Decline
               </button>
             </li>
           ))}
