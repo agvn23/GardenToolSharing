@@ -30,6 +30,14 @@ export function ToolsPage() {
     setMine(checked);
   }
 
+  function statusLabel(tool: Tool): string {
+    if (tool.status === 'Lent') {
+        return tool.borrowerName ? `Borrowed by ${tool.borrowerName}` : 'Borrowed';
+    }
+    if (tool.myMembershipStatus === 'Pending') return 'Waiting for approval';
+    return 'Available';
+    }
+
   async function handleReturn(tool: Tool) {
     if (!window.confirm(`Mark ${tool.name} as returned?`)) return;
     setActionError(null);
@@ -38,6 +46,16 @@ export function ToolsPage() {
       setReloadKey((k) => k + 1);
     } catch (err) {
       setActionError(errorMessage(err));
+    }
+  }
+
+  async function shareRequestLink(tool: Tool) {
+    const link = `${window.location.origin}/tools/${tool.id}/request`;
+    try {
+        await navigator.clipboard.writeText(link);
+        window.alert(`Request link copied:\n${link}`);
+    } catch {
+        window.prompt('Copy this request link:', link);
     }
   }
 
@@ -62,30 +80,31 @@ export function ToolsPage() {
           {tools.map((tool) => {
             const isOwner = user?.id === tool.ownerId;
             return (
-              <li key={tool.id} style={{ marginBottom: '1rem' }}>
-                <strong>{tool.name}</strong> (
-                {tool.status === 'Lent' ? 'Borrowed' : 'Available'}
-                {tool.borrowerName && ` by ${tool.borrowerName}`}) owned by {tool.ownerName}
+            <li key={tool.id} style={{ marginBottom: '1rem' }}>
+                <strong>{tool.name}</strong> ({statusLabel(tool)}) owned by {tool.ownerName}
                 <br />
                 Available {tool.availableFrom} to {tool.availableUntil}
                 {tool.description && <p style={{ margin: '0.25rem 0' }}>{tool.description}</p>}
 
-                {tool.status === 'Available' && !isOwner && borrowingId !== tool.id && (
-                  <button onClick={() => { setActionError(null); setBorrowingId(tool.id); }}>
-                    Borrow
-                  </button>
+                {tool.status === 'Available' && !isOwner && tool.myMembershipStatus !== 'Pending' && borrowingId !== tool.id && (
+                    <button onClick={() => { setActionError(null); setBorrowingId(tool.id); }}>
+                        Borrow
+                    </button>
                 )}
                 {tool.status === 'Lent' && isOwner && (
-                  <button onClick={() => handleReturn(tool)}>Mark as returned</button>
+                    <button onClick={() => handleReturn(tool)}>Mark as returned</button>
+                )}
+                {isOwner && tool.visibility === 'Private' && (
+                    <button onClick={() => shareRequestLink(tool)}>Copy request link</button>
                 )}
                 {borrowingId === tool.id && (
-                  <BorrowForm
-                    tool={tool}
-                    onDone={() => { setBorrowingId(null); setReloadKey((k) => k + 1); }}
-                    onCancel={() => setBorrowingId(null)}
-                  />
+                    <BorrowForm
+                        tool={tool}
+                        onDone={() => { setBorrowingId(null); setReloadKey((k) => k + 1); }}
+                        onCancel={() => setBorrowingId(null)}
+                    />
                 )}
-              </li>
+            </li>
             );
           })}
         </ul>

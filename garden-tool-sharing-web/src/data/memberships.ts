@@ -17,3 +17,7 @@ export function getPendingRequests(): Promise<Membership[]> {
 export function approveMembership(id: number): Promise<Membership> {
   return apiFetch<Membership>(`/memberships/${id}`, { method: 'PATCH' });
 }
+
+export function requestAccess(toolId: number): Promise<Membership> {
+  return apiFetch<Membership>('/memberships', { method: 'POST', body: { toolId } });
+}

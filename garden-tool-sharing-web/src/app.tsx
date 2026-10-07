@@ -6,6 +6,7 @@ import { ToolsPage } from './pages/ToolsPage';
 import { NewToolPage } from './pages/NewToolPage';
 import { LeaderboardPage } from './pages/LeaderboardPage';
 import { RequestsPage } from './pages/RequestsPage';
+import { RequestAccessPage } from './pages/RequestAccessPage';
 
 
 // Temporary stand-in for "/" until the Dashboard slice replaces it - proves the full
@@ -23,6 +24,7 @@ export function App() {
           <Route path="/tools/new" element={<NewToolPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/requests" element={<RequestsPage />} />
+          <Route path="/tools/:id/request" element={<RequestAccessPage />} />
         </Route>
       </Route>
       <Route path="*" element={<Navigate to="/tools" replace />} />

@@ -15,6 +15,7 @@ export interface Tool {
   ownerName: string;
   createdAt: string;      // ISO date-time
   borrowerName: string | null;
+  myMembershipStatus: 'Pending' | 'Active' | null;
 }
 
 export function getTools(options: { mine?: boolean } = {}): Promise<Tool[]> {
