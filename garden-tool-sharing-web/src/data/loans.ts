@@ -32,3 +32,16 @@ export function createLoan(input: CreateLoanInput): Promise<Loan> {
 export function returnTool(toolId: number): Promise<Loan> {
   return apiFetch<Loan>(`/tools/${toolId}:return`, { method: 'POST' });
 }
+
+export interface UpdateLoanInput {
+  borrowedUntil?: string;
+  note?: string;
+}
+
+export function updateLoan(id: number, input: UpdateLoanInput): Promise<Loan> {
+  return apiFetch<Loan>(`/loans/${id}`, { method: 'PATCH', body: input });
+}
+
+export function cancelLoan(id: number): Promise<void> {
+  return apiFetch<void>(`/loans/${id}`, { method: 'DELETE' });
+}

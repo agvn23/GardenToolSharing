@@ -5,6 +5,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { getTools, type Tool } from '../data/tools';
 import { returnTool } from '../data/loans';
 import { errorMessage } from '../utils/problemDetails';
+import { EditLoanForm } from '../components/EditLoanForm';
+import { cancelLoan } from '../data/loans';
 
 export function ToolsPage() {
   const { user } = useAuth();
@@ -59,6 +61,24 @@ export function ToolsPage() {
     }
   }
 
+  const [editingId, setEditingId] = useState<number | null>(null);
+
+function canEditLoan(tool: Tool): boolean {
+  return !!tool.myLoan && new Date(tool.myLoan.editableUntil) > new Date();
+}
+
+async function handleCancelLoan(tool: Tool) {
+  if (!tool.myLoan) return;
+  if (!window.confirm(`Cancel your loan of ${tool.name}?`)) return;
+  setActionError(null);
+  try {
+    await cancelLoan(tool.myLoan.id);
+    setReloadKey((k) => k + 1);
+  } catch (err) {
+    setActionError(errorMessage(err));
+  }
+}
+
   return (
     <section>
       <h1>Tools</h1>
@@ -86,6 +106,13 @@ export function ToolsPage() {
                 Available {tool.availableFrom} to {tool.availableUntil}
                 {tool.description && <p style={{ margin: '0.25rem 0' }}>{tool.description}</p>}
 
+                {tool.myLoan && (
+                    <p style={{ margin: '0.25rem 0' }}>
+                        Your loan: {tool.myLoan.borrowedFrom} to {tool.myLoan.borrowedUntil}
+                        {tool.myLoan.note && ` ("${tool.myLoan.note}")`}
+                    </p>
+                )}
+
                 {tool.status === 'Available' && !isOwner && tool.myMembershipStatus !== 'Pending' && borrowingId !== tool.id && (
                     <button onClick={() => { setActionError(null); setBorrowingId(tool.id); }}>
                         Borrow
@@ -97,6 +124,22 @@ export function ToolsPage() {
                 {isOwner && tool.visibility === 'Private' && (
                     <button onClick={() => shareRequestLink(tool)}>Copy request link</button>
                 )}
+
+                {canEditLoan(tool) && editingId !== tool.id && (
+                    <>
+                        <button onClick={() => { setActionError(null); setEditingId(tool.id); }}>Edit loan</button>{' '}
+                        <button onClick={() => handleCancelLoan(tool)}>Cancel loan</button>
+                    </>
+                )}
+                {editingId === tool.id && tool.myLoan && (
+                    <EditLoanForm
+                        tool={tool}
+                        loan={tool.myLoan}
+                        onDone={() => { setEditingId(null); setReloadKey((k) => k + 1); }}
+                        onCancel={() => setEditingId(null)}
+                    />
+                )}
+
                 {borrowingId === tool.id && (
                     <BorrowForm
                         tool={tool}

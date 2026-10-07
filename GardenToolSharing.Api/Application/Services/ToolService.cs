@@ -60,10 +60,17 @@ private static ToolDto ToDto(Tool t, int viewerId)
 
     var myMembership = t.Memberships.FirstOrDefault(m => m.UserId == viewerId);
 
+    var myLoan = activeLoan is not null && activeLoan.BorrowerId == viewerId
+        ? new MyLoanDto(
+            activeLoan.Id, activeLoan.BorrowedFrom, activeLoan.BorrowedUntil, activeLoan.Note,
+            DateTime.SpecifyKind(activeLoan.CreatedAt, DateTimeKind.Utc).Add(Loan.EditWindow))
+        : null;
+
     return new ToolDto(
         t.Id, t.Name, t.Description, t.Visibility, t.Status,
         t.AvailableFrom, t.AvailableUntil, t.OwnerId, t.Owner.DisplayName, t.CreatedAt,
         canSeeBorrower ? activeLoan!.Borrower.DisplayName : null,
-        myMembership?.Status);    
+        myMembership?.Status,
+        myLoan);   
     }
 }
