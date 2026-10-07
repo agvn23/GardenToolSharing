@@ -57,10 +57,6 @@ private static ToolDto ToDto(Tool t, int viewerId)
     var canSeeBorrower = activeLoan is not null
         && (t.OwnerId == viewerId || activeLoan.BorrowerId == viewerId);
 
-    return new ToolDto(
-        t.Id, t.Name, t.Description, t.Visibility, t.Status,
-        t.AvailableFrom, t.AvailableUntil, t.OwnerId, t.Owner.DisplayName, t.CreatedAt,
-        canSeeBorrower ? activeLoan!.Borrower.DisplayName : null);
 
     var myMembership = t.Memberships.FirstOrDefault(m => m.UserId == viewerId);
 
@@ -69,5 +65,5 @@ private static ToolDto ToDto(Tool t, int viewerId)
         t.AvailableFrom, t.AvailableUntil, t.OwnerId, t.Owner.DisplayName, t.CreatedAt,
         canSeeBorrower ? activeLoan!.Borrower.DisplayName : null,
         myMembership?.Status);    
-}
+    }
 }

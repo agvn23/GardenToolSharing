@@ -21,3 +21,7 @@ export function approveMembership(id: number): Promise<Membership> {
 export function requestAccess(toolId: number): Promise<Membership> {
   return apiFetch<Membership>('/memberships', { method: 'POST', body: { toolId } });
 }
+
+export function declineMembership(id: number): Promise<void> {
+  return apiFetch<void>(`/memberships/${id}`, { method: 'DELETE' });
+}

@@ -47,8 +47,14 @@ public class MembershipService(
     {
         var membership = await memberships.FindByIdAsync(membershipId, ct);
 
-        // Hide existence of memberships that aren't the caller's own
-        if (membership is null || membership.UserId != userId)
+        // Allowed for the member themselves (leaving, or cancelling their own request), or for the
+        // tool's owner declining a request that is still pending. Anyone else sees "not found".
+        var isOwnMembership = membership?.UserId == userId;
+        var isOwnerDecliningPending = membership is not null
+            && membership.Tool.OwnerId == userId
+            && membership.Status == MembershipStatus.Pending;
+
+        if (membership is null || !(isOwnMembership || isOwnerDecliningPending))
             throw new NotFoundException("Membership not found.");
 
         memberships.Remove(membership);
