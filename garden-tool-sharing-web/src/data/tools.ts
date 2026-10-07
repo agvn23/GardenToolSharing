@@ -16,6 +16,7 @@ export interface Tool {
   createdAt: string;      // ISO date-time
   borrowerName: string | null;
   myMembershipStatus: 'Pending' | 'Active' | null;
+  myLoan: MyLoan | null;
 }
 
 export function getTools(options: { mine?: boolean } = {}): Promise<Tool[]> {
@@ -32,4 +33,12 @@ export interface CreateToolInput {
 
 export function createTool(input: CreateToolInput): Promise<Tool> {
   return apiFetch<Tool>('/tools', { method: 'POST', body: input });
+}
+
+export interface MyLoan {
+  id: number;
+  borrowedFrom: string;
+  borrowedUntil: string;
+  note: string | null;
+  editableUntil: string; // ISO date-time (UTC)
 }
