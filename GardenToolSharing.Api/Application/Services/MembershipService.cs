@@ -72,6 +72,12 @@ public class MembershipService(
         return ToDto(membership);
     }
 
+    public async Task<IReadOnlyList<MembershipDto>> ListPendingAsync(int ownerId, CancellationToken ct)
+    {
+        var pending = await memberships.ListPendingForOwnerAsync(ownerId, ct);
+        return pending.Select(ToDto).ToList();
+    }
+
     private static MembershipDto ToDto(Membership m) => new(
         m.Id, m.ToolId, m.Tool.Name, m.UserId, m.User.DisplayName, m.Status, m.CreatedAt);
 }

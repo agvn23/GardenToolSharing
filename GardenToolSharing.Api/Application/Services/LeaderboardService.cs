@@ -20,7 +20,7 @@ public class LeaderboardService(ILeaderboardRepository repository) : ILeaderboar
         var rows = await repository.GetTopLendersAsync(Limit, ct);
 
         return rows
-            .Select((r, index) => new LeaderboardEntryDto(index + 1, r.OwnerId, r.OwnerName, r.LoanCount))
+            .Select((r, index) => new LeaderboardEntryDto(index + 1, r.OwnerId, r.OwnerName, r.LoanCount, r.ActiveLoanCount))
             .ToList();
     }
 }

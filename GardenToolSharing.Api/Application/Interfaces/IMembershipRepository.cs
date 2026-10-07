@@ -14,4 +14,7 @@ public interface IMembershipRepository
     void Remove(Membership membership);
 
     Task SaveChangesAsync(CancellationToken ct);
+
+    /// <summary>Pending memberships on tools owned by ownerId, with User and Tool loaded, oldest first.</summary>
+    Task<IReadOnlyList<Membership>> ListPendingForOwnerAsync(int ownerId, CancellationToken ct);
 }

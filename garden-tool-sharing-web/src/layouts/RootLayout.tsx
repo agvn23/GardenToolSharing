@@ -29,6 +29,9 @@ export function RootLayout() {
           <Link to="/leaderboard" style={{ color: '#fff', textDecoration: 'none', fontWeight: 600 }}>
             Leaderboard
           </Link>
+          <Link to="/requests" style={{ color: '#fff', textDecoration: 'none', fontWeight: 600 }}>
+            Requests
+          </Link>
           </nav>
         <button
           onClick={handleLogout}
