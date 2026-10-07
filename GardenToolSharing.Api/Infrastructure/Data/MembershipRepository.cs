@@ -25,4 +25,14 @@ public class MembershipRepository(AppDbContext db) : IMembershipRepository
     public void Remove(Membership membership) => db.Memberships.Remove(membership);
 
     public Task SaveChangesAsync(CancellationToken ct) => db.SaveChangesAsync(ct);
+
+    public async Task<IReadOnlyList<Membership>> ListPendingForOwnerAsync(int ownerId, CancellationToken ct) =>
+    await db.Memberships
+        .AsNoTracking()
+        .Include(m => m.User)
+        .Include(m => m.Tool)
+        .Where(m => m.Tool.OwnerId == ownerId && m.Status == MembershipStatus.Pending)
+        .OrderBy(m => m.CreatedAt)
+        .ThenBy(m => m.Id)
+        .ToListAsync(ct);
 }

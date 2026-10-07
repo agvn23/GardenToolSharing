@@ -7,4 +7,5 @@ public interface IMembershipService
     Task<MembershipDto> JoinAsync(int userId, JoinToolRequest request, CancellationToken ct);
     Task LeaveAsync(int userId, int membershipId, CancellationToken ct);
     Task<MembershipDto> ApproveAsync(int ownerId, int membershipId, CancellationToken ct);
+    Task<IReadOnlyList<MembershipDto>> ListPendingAsync(int ownerId, CancellationToken ct);
 }

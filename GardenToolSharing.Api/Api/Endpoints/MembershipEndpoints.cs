@@ -25,6 +25,12 @@ public static class MembershipEndpoints
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status409Conflict);
 
+        // Owner's inbox: pending join requests on the caller's own tools.
+        group.MapGet("/pending", async (
+                ClaimsPrincipal user, IMembershipService memberships, CancellationToken ct) =>
+                Results.Ok(await memberships.ListPendingAsync(user.GetUserId(), ct)))
+            .Produces<IReadOnlyList<MembershipDto>>();
+
         // Owner approves a pending (private-tool) request. No body: PATCH here always means "approve".
         group.MapPatch("/{id:int}", async (
                 int id, ClaimsPrincipal user, IMembershipService memberships, CancellationToken ct) =>
