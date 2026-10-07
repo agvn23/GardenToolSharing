@@ -13,4 +13,5 @@ public record ToolDto(
     int OwnerId,
     string OwnerName,
     DateTime CreatedAt,
-    string? BorrowerName = null);
+    string? BorrowerName = null,
+    MembershipStatus? MyMembershipStatus = null);
