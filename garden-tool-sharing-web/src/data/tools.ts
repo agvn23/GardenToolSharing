@@ -35,6 +35,26 @@ export function createTool(input: CreateToolInput): Promise<Tool> {
   return apiFetch<Tool>('/tools', { method: 'POST', body: input });
 }
 
+export function getTool(id: number): Promise<Tool> {
+  return apiFetch<Tool>(`/tools/${id}`);
+}
+
+export function updateTool(id: number, input: CreateToolInput): Promise<Tool> {
+  return apiFetch<Tool>(`/tools/${id}`, { method: 'PUT', body: input });
+}
+
+export function removeTool(id: number): Promise<void> {
+  return apiFetch<void>(`/tools/${id}`, { method: 'DELETE' });
+}
+
+export function restoreTool(id: number): Promise<Tool> {
+  return apiFetch<Tool>(`/tools/${id}:restore`, { method: 'POST' });
+}
+
+export function getHiddenTools(): Promise<Tool[]> {
+  return apiFetch<Tool[]>('/tools/hidden');
+}
+
 export interface MyLoan {
   id: number;
   borrowedFrom: string;

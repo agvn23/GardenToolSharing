@@ -7,6 +7,7 @@ import { returnTool } from '../data/loans';
 import { errorMessage } from '../utils/problemDetails';
 import { EditLoanForm } from '../components/EditLoanForm';
 import { cancelLoan } from '../data/loans';
+import { removeTool } from '../data/tools';
 
 export function ToolsPage() {
   const { user } = useAuth();
@@ -51,6 +52,17 @@ export function ToolsPage() {
     }
   }
 
+  async function handleRemove(tool: Tool) {
+    if (!window.confirm(`Remove ${tool.name}? It will be hidden from everyone until you restore it from Hidden tools.`)) return;
+    setActionError(null);
+    try {
+        await removeTool(tool.id);
+        setReloadKey((k) => k + 1);
+    } catch (err) {
+        setActionError(errorMessage(err));
+    }
+  }
+
   async function shareRequestLink(tool: Tool) {
     const link = `${window.location.origin}/tools/${tool.id}/request`;
     try {
@@ -82,7 +94,7 @@ async function handleCancelLoan(tool: Tool) {
   return (
     <section>
       <h1>Tools</h1>
-      <p><Link to="/tools/new">Add a tool</Link></p>
+      <p><Link to="/tools/new">Add a tool</Link> · <Link to="/tools/hidden">Hidden tools</Link></p>
 
       <label style={{ display: 'inline-flex', gap: '0.5rem', alignItems: 'center' }}>
         <input type="checkbox" checked={mine} onChange={(e) => handleToggle(e.target.checked)} />
@@ -123,6 +135,13 @@ async function handleCancelLoan(tool: Tool) {
                 )}
                 {isOwner && tool.visibility === 'Private' && (
                     <button onClick={() => shareRequestLink(tool)}>Copy request link</button>
+                )}
+
+                {isOwner && tool.status === 'Available' && (
+                    <>
+                        <Link to={`/tools/${tool.id}/edit`}>Edit</Link>{' '}
+                        <button onClick={() => handleRemove(tool)}>Remove</button>
+                    </>
                 )}
 
                 {canEditLoan(tool) && editingId !== tool.id && (

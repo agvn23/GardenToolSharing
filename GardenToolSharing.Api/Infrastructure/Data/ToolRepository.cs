@@ -13,11 +13,30 @@ public class ToolRepository(AppDbContext db) : IToolRepository
     }
 
     public Task<Tool?> FindByIdAsync(int toolId, CancellationToken ct) =>
-        db.Tools.AsNoTracking().FirstOrDefaultAsync(t => t.Id == toolId, ct);
+        db.Tools.AsNoTracking().FirstOrDefaultAsync(t => t.Id == toolId && !t.IsDeleted, ct);
 
     public Task<Tool?> FindTrackedByIdAsync(int toolId, CancellationToken ct) =>
-        db.Tools.FirstOrDefaultAsync(t => t.Id == toolId, ct);
+        db.Tools.FirstOrDefaultAsync(t => t.Id == toolId && !t.IsDeleted, ct);
 
+    public Task<Tool?> FindTrackedIncludingDeletedAsync(int toolId, CancellationToken ct) =>
+    db.Tools.FirstOrDefaultAsync(t => t.Id == toolId, ct);
+
+    public async Task<IReadOnlyList<Tool>> ListHiddenOwnedByAsync(int ownerId, CancellationToken ct) =>
+        await db.Tools
+            .AsNoTracking()
+            .Include(t => t.Owner)
+            .Where(t => t.OwnerId == ownerId && t.IsDeleted)
+            .OrderBy(t => t.Name)
+            .ThenBy(t => t.Id)
+            .ToListAsync(ct);
+
+    public Task SaveChangesAsync(CancellationToken ct) => db.SaveChangesAsync(ct);
+
+    private IQueryable<Tool> VisibleTo(int userId) =>
+        db.Tools.Where(t => !t.IsDeleted && (
+            t.Visibility == ToolVisibility.Public ||
+            t.OwnerId == userId ||
+            t.Memberships.Any(m => m.UserId == userId)));
     public Task<Tool?> FindVisibleToAsync(int toolId, int userId, CancellationToken ct) =>
         VisibleTo(userId)
             .AsNoTracking()
@@ -54,10 +73,4 @@ public class ToolRepository(AppDbContext db) : IToolRepository
             .ToListAsync(ct);
     }
 
-    // Visible = public, or owned by the user, or the user has any membership on it
-    private IQueryable<Tool> VisibleTo(int userId) =>
-        db.Tools.Where(t =>
-            t.Visibility == ToolVisibility.Public ||
-            t.OwnerId == userId ||
-            t.Memberships.Any(m => m.UserId == userId));
 }

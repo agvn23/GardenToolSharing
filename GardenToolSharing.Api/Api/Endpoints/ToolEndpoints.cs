@@ -47,6 +47,42 @@ public static class ToolEndpoints
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status409Conflict);
 
+            group.MapGet("/hidden", async (ClaimsPrincipal user, IToolService tools, CancellationToken ct) =>
+        Results.Ok(await tools.ListHiddenAsync(user.GetUserId(), ct)))
+    .Produces<IReadOnlyList<ToolDto>>();
+
+group.MapPut("/{id:int}", async (
+        int id, CreateToolRequest request, ClaimsPrincipal user, IToolService tools, CancellationToken ct) =>
+        Results.Ok(await tools.UpdateAsync(user.GetUserId(), id, request, ct)))
+    .AddEndpointFilter<ValidationFilter<CreateToolRequest>>()
+    .RequireRateLimiting("default-write")
+    .Produces<ToolDto>()
+    .ProducesValidationProblem()
+    .ProducesProblem(StatusCodes.Status403Forbidden)
+    .ProducesProblem(StatusCodes.Status404NotFound)
+    .ProducesProblem(StatusCodes.Status409Conflict);
+
+group.MapDelete("/{id:int}", async (
+        int id, ClaimsPrincipal user, IToolService tools, CancellationToken ct) =>
+    {
+        await tools.DeleteAsync(user.GetUserId(), id, ct);
+        return Results.NoContent();
+    })
+    .RequireRateLimiting("default-write")
+    .Produces(StatusCodes.Status204NoContent)
+    .ProducesProblem(StatusCodes.Status403Forbidden)
+    .ProducesProblem(StatusCodes.Status404NotFound)
+    .ProducesProblem(StatusCodes.Status409Conflict);
+
+group.MapPost("/{id:int}:restore", async (
+        int id, ClaimsPrincipal user, IToolService tools, CancellationToken ct) =>
+        Results.Ok(await tools.RestoreAsync(user.GetUserId(), id, ct)))
+    .RequireRateLimiting("default-write")
+    .Produces<ToolDto>()
+    .ProducesProblem(StatusCodes.Status403Forbidden)
+    .ProducesProblem(StatusCodes.Status404NotFound)
+    .ProducesProblem(StatusCodes.Status409Conflict);
+
         return app;
     }
 }
