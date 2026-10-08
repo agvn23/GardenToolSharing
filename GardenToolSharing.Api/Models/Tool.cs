@@ -21,4 +21,8 @@ public class Tool
     /// <summary>True when the requested period lies inside the owner's availability window.</summary>
     public bool IsWithinWindow(DateOnly from, DateOnly until) =>
         from >= AvailableFrom && until <= AvailableUntil;
+
+    /// <summary>Soft delete: hidden from everyone but its owner, who can restore it.</summary>
+    public bool IsDeleted { get; set; }
 }
+
