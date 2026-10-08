@@ -25,4 +25,13 @@ public interface IToolRepository
     /// </summary>
     Task<IReadOnlyList<Tool>> ListVisibleToAsync(
         int userId, ToolVisibility? visibility, ToolStatus? status, bool mineOnly, CancellationToken ct);
+
+    /// <summary>Like FindTrackedByIdAsync, but also finds soft-deleted tools. Used to restore.</summary>
+    Task<Tool?> FindTrackedIncludingDeletedAsync(int toolId, CancellationToken ct);
+
+    /// <summary>The owner's soft-deleted tools, with Owner loaded.</summary>
+    Task<IReadOnlyList<Tool>> ListHiddenOwnedByAsync(int ownerId, CancellationToken ct);
+
+    Task SaveChangesAsync(CancellationToken ct);
+
 }
