@@ -74,7 +74,7 @@ export function ToolForm({ initial, submitLabel, onSubmit }: Props) {
           style={{ display: 'block' }}
         >
           <option value="Public">Public: listed for everyone, anyone can borrow</option>
-          <option value="Private">Private: hidden, borrowers need your approval</option>
+          <option value="Private">Private: listed by name only, borrowers need your approval</option>
         </select>
       </label>
 

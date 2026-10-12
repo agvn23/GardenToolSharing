@@ -32,11 +32,11 @@ public class ToolRepository(AppDbContext db) : IToolRepository
 
     public Task SaveChangesAsync(CancellationToken ct) => db.SaveChangesAsync(ct);
 
+    // Every tool that hasn't been removed is listed for everyone. Private tools are masked
+    // in ToolService.ToDto until the owner approves the viewer.
     private IQueryable<Tool> VisibleTo(int userId) =>
-        db.Tools.Where(t => !t.IsDeleted && (
-            t.Visibility == ToolVisibility.Public ||
-            t.OwnerId == userId ||
-            t.Memberships.Any(m => m.UserId == userId)));
+        db.Tools.Where(t => !t.IsDeleted);
+
     public Task<Tool?> FindVisibleToAsync(int toolId, int userId, CancellationToken ct) =>
         VisibleTo(userId)
             .AsNoTracking()
