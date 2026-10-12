@@ -127,20 +127,24 @@ public class ToolService(IToolRepository tools, TimeProvider time) : IToolServic
         var canSeeBorrower = activeLoan is not null
             && (t.OwnerId == viewerId || activeLoan.BorrowerId == viewerId);
 
-
         var myMembership = t.Memberships.FirstOrDefault(m => m.UserId == viewerId);
 
-        var myLoan = activeLoan is not null && activeLoan.BorrowerId == viewerId
-            ? new MyLoanDto(
-                activeLoan.Id, activeLoan.BorrowedFrom, activeLoan.BorrowedUntil, activeLoan.Note,
-                DateTime.SpecifyKind(activeLoan.CreatedAt, DateTimeKind.Utc).Add(Loan.EditWindow))
+    // Private tools show their description only to the owner and approved members
+    var canSeeDetails = t.Visibility == ToolVisibility.Public
+        || t.OwnerId == viewerId
+        || myMembership?.Status == MembershipStatus.Active;
+
+    var myLoan = activeLoan is not null && activeLoan.BorrowerId == viewerId
+        ? new MyLoanDto(
+            activeLoan.Id, activeLoan.BorrowedFrom, activeLoan.BorrowedUntil, activeLoan.Note,
+            DateTime.SpecifyKind(activeLoan.CreatedAt, DateTimeKind.Utc).Add(Loan.EditWindow))
         : null;
 
     return new ToolDto(
-        t.Id, t.Name, t.Description, t.Visibility, t.Status,
+        t.Id, t.Name, canSeeDetails ? t.Description : null, t.Visibility, t.Status,
         t.AvailableFrom, t.AvailableUntil, t.OwnerId, t.Owner.DisplayName, t.CreatedAt,
         canSeeBorrower ? activeLoan!.Borrower.DisplayName : null,
         myMembership?.Status,
-        myLoan);   
+        myLoan);
     }
 }

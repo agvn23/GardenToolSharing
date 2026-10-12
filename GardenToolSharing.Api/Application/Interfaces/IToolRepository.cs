@@ -15,7 +15,7 @@ public interface IToolRepository
     Task<Tool?> FindTrackedByIdAsync(int toolId, CancellationToken ct);
 
     /// <summary>
-    /// Returns the tool (with Owner) only if the user may see it: public, owned by the user,
+    /// Returns the tool (with Owner): public, owned by the user,
     /// or the user has a membership on it (any status). Otherwise null.
     /// </summary>
     Task<Tool?> FindVisibleToAsync(int toolId, int userId, CancellationToken ct);

@@ -8,6 +8,7 @@ import { errorMessage } from '../utils/problemDetails';
 import { EditLoanForm } from '../components/EditLoanForm';
 import { cancelLoan } from '../data/loans';
 import { removeTool } from '../data/tools';
+import { requestAccess } from '../data/memberships';
 
 export function ToolsPage() {
   const { user } = useAuth();
@@ -33,13 +34,18 @@ export function ToolsPage() {
     setMine(checked);
   }
 
-  function statusLabel(tool: Tool): string {
+  function needsApproval(tool: Tool, userId: number | undefined): boolean {
+    return tool.visibility === 'Private' && tool.ownerId !== userId && tool.myMembershipStatus === null;
+  }
+
+  function statusLabel(tool: Tool, userId: number | undefined): string {
     if (tool.status === 'Lent') {
         return tool.borrowerName ? `Borrowed by ${tool.borrowerName}` : 'Borrowed';
     }
     if (tool.myMembershipStatus === 'Pending') return 'Waiting for approval';
+    if (needsApproval(tool, userId)) return 'Approval Required';
     return 'Available';
-    }
+  }
 
   async function handleReturn(tool: Tool) {
     if (!window.confirm(`Mark ${tool.name} as returned?`)) return;
@@ -49,6 +55,16 @@ export function ToolsPage() {
       setReloadKey((k) => k + 1);
     } catch (err) {
       setActionError(errorMessage(err));
+    }
+  }
+
+  async function handleRequestAccess(tool: Tool) {
+    setActionError(null);
+    try {
+        await requestAccess(tool.id);
+        setReloadKey((k) => k + 1);
+    } catch (err) {
+        setActionError(errorMessage(err));
     }
   }
 
@@ -125,11 +141,19 @@ async function handleCancelLoan(tool: Tool) {
                     </p>
                 )}
 
-                {tool.status === 'Available' && !isOwner && tool.myMembershipStatus !== 'Pending' && borrowingId !== tool.id && (
-                    <button onClick={() => { setActionError(null); setBorrowingId(tool.id); }}>
-                        Borrow
-                    </button>
+                {tool.status === 'Available' && !isOwner && tool.myMembershipStatus !== 'Pending'
+                    && !needsApproval(tool, user?.id) && borrowingId !== tool.id && (
+                    <button onClick={() => { setActionError(null); setBorrowingId(tool.id); }}>Borrow</button>
                 )}
+                {needsApproval(tool, user?.id) && (
+                    <button onClick={() => handleRequestAccess(tool)}>Request access</button>
+                )}
+                {tool.visibility === 'Private' && !isOwner && tool.myMembershipStatus !== 'Active' && (
+                    <p style={{ margin: '0.25rem 0', color: '#555' }}>
+                        Details are shown once the owner approves your request.
+                    </p>
+                )}
+                
                 {tool.status === 'Lent' && isOwner && (
                     <button onClick={() => handleReturn(tool)}>Mark as returned</button>
                 )}
