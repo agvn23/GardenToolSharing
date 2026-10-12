@@ -10,6 +10,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Tool> Tools => Set<Tool>();
     public DbSet<Membership> Memberships => Set<Membership>();
     public DbSet<Loan> Loans => Set<Loan>();
+    public DbSet<ToolPhoto> ToolPhotos => Set<ToolPhoto>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) =>
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
