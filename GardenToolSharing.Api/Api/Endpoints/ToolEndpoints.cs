@@ -5,6 +5,7 @@ using GardenToolSharing.Api.Common;
 using GardenToolSharing.Api.Dtos.Loans;
 using GardenToolSharing.Api.Dtos.Tools;
 using GardenToolSharing.Api.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GardenToolSharing.Api.Api.Endpoints;
 
@@ -82,6 +83,44 @@ group.MapPost("/{id:int}:restore", async (
     .ProducesProblem(StatusCodes.Status403Forbidden)
     .ProducesProblem(StatusCodes.Status404NotFound)
     .ProducesProblem(StatusCodes.Status409Conflict);
+
+group.MapPost("/{id:int}/photos", async (
+        int id, [FromForm] string? caption, IFormFile file,
+        ClaimsPrincipal user, IToolPhotoService photos, CancellationToken ct) =>
+    {
+        await using var stream = file.OpenReadStream();
+        var photo = await photos.AddAsync(user.GetUserId(), id, caption, stream, file.Length, ct);
+        return Results.Created($"/tools/{id}/photos/{photo.Id}", photo);
+    })
+    .DisableAntiforgery() // safe here: requests are authenticated by a bearer token, not cookies
+    .RequireRateLimiting("photo-write")
+    .Produces<ToolPhotoDto>(StatusCodes.Status201Created)
+    .ProducesValidationProblem()
+    .ProducesProblem(StatusCodes.Status403Forbidden)
+    .ProducesProblem(StatusCodes.Status404NotFound)
+    .ProducesProblem(StatusCodes.Status409Conflict);
+
+group.MapGet("/{id:int}/photos/{photoId:int}", async (
+        int id, int photoId, ClaimsPrincipal user, IToolPhotoService photos, CancellationToken ct) =>
+    {
+        var file = await photos.GetAsync(user.GetUserId(), id, photoId, ct);
+        return Results.File(file.Content, file.ContentType);
+    })
+    .Produces(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status404NotFound);
+
+group.MapDelete("/{id:int}/photos/{photoId:int}", async (
+        int id, int photoId, ClaimsPrincipal user, IToolPhotoService photos, CancellationToken ct) =>
+    {
+        await photos.DeleteAsync(user.GetUserId(), id, photoId, ct);
+        return Results.NoContent();
+    })
+    .RequireRateLimiting("photo-write")
+    .Produces(StatusCodes.Status204NoContent)
+    .ProducesProblem(StatusCodes.Status403Forbidden)
+    .ProducesProblem(StatusCodes.Status404NotFound)
+    .ProducesProblem(StatusCodes.Status409Conflict);
+
 
         return app;
     }

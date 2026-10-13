@@ -45,7 +45,7 @@ public class ToolService(IToolRepository tools, TimeProvider time) : IToolServic
 
     public async Task<ToolDto> GetAsync(int userId, int toolId, CancellationToken ct)
     {
-        // Private tools the user has no relation to look exactly like tools that don't exist
+        // Removed tools look exactly like tools that don't exist
         var tool = await tools.FindVisibleToAsync(toolId, userId, ct)
             ?? throw new NotFoundException("Tool not found.");
         return ToDto(tool, userId);
@@ -129,22 +129,28 @@ public class ToolService(IToolRepository tools, TimeProvider time) : IToolServic
 
         var myMembership = t.Memberships.FirstOrDefault(m => m.UserId == viewerId);
 
-    // Private tools show their description only to the owner and approved members
-    var canSeeDetails = t.Visibility == ToolVisibility.Public
-        || t.OwnerId == viewerId
-        || myMembership?.Status == MembershipStatus.Active;
+        // Private tools show their description only to the owner and approved members
+        var canSeeDetails = t.Visibility == ToolVisibility.Public
+            || t.OwnerId == viewerId
+            || myMembership?.Status == MembershipStatus.Active;
 
-    var myLoan = activeLoan is not null && activeLoan.BorrowerId == viewerId
-        ? new MyLoanDto(
-            activeLoan.Id, activeLoan.BorrowedFrom, activeLoan.BorrowedUntil, activeLoan.Note,
-            DateTime.SpecifyKind(activeLoan.CreatedAt, DateTimeKind.Utc).Add(Loan.EditWindow))
-        : null;
+        var myLoan = activeLoan is not null && activeLoan.BorrowerId == viewerId
+            ? new MyLoanDto(
+                activeLoan.Id, activeLoan.BorrowedFrom, activeLoan.BorrowedUntil, activeLoan.Note,
+                DateTime.SpecifyKind(activeLoan.CreatedAt, DateTimeKind.Utc).Add(Loan.EditWindow))
+            : null;
 
-    return new ToolDto(
-        t.Id, t.Name, canSeeDetails ? t.Description : null, t.Visibility, t.Status,
-        t.AvailableFrom, t.AvailableUntil, t.OwnerId, t.Owner.DisplayName, t.CreatedAt,
-        canSeeBorrower ? activeLoan!.Borrower.DisplayName : null,
-        myMembership?.Status,
-        myLoan);
+        var photos = t.Photos
+            .OrderBy(p => p.CreatedAt)
+            .Select(p => new ToolPhotoDto(p.Id, p.Caption, p.CreatedAt))
+            .ToList();
+
+        return new ToolDto(
+            t.Id, t.Name, canSeeDetails ? t.Description : null, t.Visibility, t.Status,
+            t.AvailableFrom, t.AvailableUntil, t.OwnerId, t.Owner.DisplayName, t.CreatedAt,
+            canSeeBorrower ? activeLoan!.Borrower.DisplayName : null,
+            myMembership?.Status,
+            myLoan,
+            photos);
     }
 }

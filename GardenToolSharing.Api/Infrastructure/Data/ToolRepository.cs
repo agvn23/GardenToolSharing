@@ -25,6 +25,7 @@ public class ToolRepository(AppDbContext db) : IToolRepository
         await db.Tools
             .AsNoTracking()
             .Include(t => t.Owner)
+            .Include(t => t.Photos)
             .Where(t => t.OwnerId == ownerId && t.IsDeleted)
             .OrderBy(t => t.Name)
             .ThenBy(t => t.Id)
@@ -41,6 +42,7 @@ public class ToolRepository(AppDbContext db) : IToolRepository
         VisibleTo(userId)
             .AsNoTracking()
             .Include(t => t.Owner)
+            .Include(t => t.Photos)
             .Include(t => t.Loans.Where(l => l.ReturnedAt == null)).ThenInclude(l => l.Borrower)
             .Include(t => t.Memberships.Where(m => m.UserId == userId))
             .FirstOrDefaultAsync(t => t.Id == toolId, ct);
@@ -66,6 +68,7 @@ public class ToolRepository(AppDbContext db) : IToolRepository
         return await query
             .AsNoTracking()
             .Include(t => t.Owner)
+            .Include(t => t.Photos)
             .Include(t => t.Loans.Where(l => l.ReturnedAt == null)).ThenInclude(l => l.Borrower)
             .Include(t => t.Memberships.Where(m => m.UserId == userId))
             .OrderBy(t => t.Name)
