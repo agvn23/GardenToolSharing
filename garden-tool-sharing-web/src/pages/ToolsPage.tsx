@@ -9,6 +9,7 @@ import { EditLoanForm } from '../components/EditLoanForm';
 import { cancelLoan } from '../data/loans';
 import { removeTool } from '../data/tools';
 import { requestAccess } from '../data/memberships';
+import { PhotoGallery } from '../components/PhotoGallery'
 
 export function ToolsPage() {
   const { user } = useAuth();
@@ -133,6 +134,8 @@ async function handleCancelLoan(tool: Tool) {
                 <br />
                 Available {tool.availableFrom} to {tool.availableUntil}
                 {tool.description && <p style={{ margin: '0.25rem 0' }}>{tool.description}</p>}
+
+                {tool.photos && tool.photos.length > 0 && <PhotoGallery toolId={tool.id} photos={tool.photos} />}
 
                 {tool.myLoan && (
                     <p style={{ margin: '0.25rem 0' }}>
