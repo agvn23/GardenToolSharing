@@ -32,3 +32,24 @@ export async function apiFetch<T>(path: string, options: ApiRequestOptions = {})
 
   return (await response.json()) as T;
 }
+
+export async function apiUploadForm<T>(path: string, form: FormData): Promise<T> {
+  const token = getStoredToken();
+  const headers = new Headers({ Accept: 'application/json' });
+  if (token) headers.set('Authorization', `Bearer ${token}`);
+
+  // No Content-Type here: the browser sets the multipart boundary itself
+  const response = await fetch(`${baseUrl}${path}`, { method: 'POST', headers, body: form });
+  if (!response.ok) throw await parseApiError(response);
+  return (await response.json()) as T;
+}
+
+export async function apiFetchBlob(path: string): Promise<Blob> {
+  const token = getStoredToken();
+  const headers = new Headers();
+  if (token) headers.set('Authorization', `Bearer ${token}`);
+
+  const response = await fetch(`${baseUrl}${path}`, { headers });
+  if (!response.ok) throw await parseApiError(response);
+  return response.blob();
+}

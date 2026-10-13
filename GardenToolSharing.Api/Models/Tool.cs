@@ -17,6 +17,7 @@ public class Tool
 
     public List<Membership> Memberships { get; set; } = [];
     public List<Loan> Loans { get; set; } = [];
+    public List<ToolPhoto> Photos { get; set; } = [];
 
     /// <summary>True when the requested period lies inside the owner's availability window.</summary>
     public bool IsWithinWindow(DateOnly from, DateOnly until) =>

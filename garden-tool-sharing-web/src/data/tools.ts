@@ -1,4 +1,5 @@
-import { apiFetch } from '../utils/api'; // adjust the path to match your other modules
+import { apiFetch, apiUploadForm } from '../utils/api'; // adjust the path to match your other modules
+
 
 export type ToolVisibility = 'Public' | 'Private';
 export type ToolStatus = 'Available' | 'Lent';
@@ -17,6 +18,7 @@ export interface Tool {
   borrowerName: string | null;
   myMembershipStatus: 'Pending' | 'Active' | null;
   myLoan: MyLoan | null;
+  photos: ToolPhoto[] | null;
 }
 
 export function getTools(options: { mine?: boolean } = {}): Promise<Tool[]> {
@@ -61,4 +63,21 @@ export interface MyLoan {
   borrowedUntil: string;
   note: string | null;
   editableUntil: string; // ISO date-time (UTC)
+}
+
+export interface ToolPhoto {
+  id: number;
+  caption: string;
+  createdAt: string;
+}
+
+export function uploadToolPhoto(toolId: number, image: Blob, caption: string): Promise<ToolPhoto> {
+  const form = new FormData();
+  form.append('caption', caption);
+  form.append('file', image, 'photo.jpg');
+  return apiUploadForm<ToolPhoto>(`/tools/${toolId}/photos`, form);
+}
+
+export function deleteToolPhoto(toolId: number, photoId: number): Promise<void> {
+  return apiFetch<void>(`/tools/${toolId}/photos/${photoId}`, { method: 'DELETE' });
 }

@@ -1,14 +1,17 @@
 import { useState, type FormEvent } from 'react';
 import type { CreateToolInput, Tool, ToolVisibility } from '../data/tools';
 import { errorMessage } from '../utils/problemDetails';
+import { PhotoFields } from './PhotoFields';
+import type { QueuedPhoto } from '../utils/photos';
 
 interface Props {
   initial?: Tool;
   submitLabel: string;
-  onSubmit: (input: CreateToolInput) => Promise<void>;
+  maxNewPhotos?: number;
+  onSubmit: (input: CreateToolInput, photos: QueuedPhoto[]) => Promise<void>;
 }
 
-export function ToolForm({ initial, submitLabel, onSubmit }: Props) {
+export function ToolForm({ initial, submitLabel, maxNewPhotos = 6, onSubmit }: Props) {
   const today = new Date().toLocaleDateString('en-CA'); // local date as YYYY-MM-DD
 
   const [name, setName] = useState(initial?.name ?? '');
@@ -18,6 +21,7 @@ export function ToolForm({ initial, submitLabel, onSubmit }: Props) {
   const [availableUntil, setAvailableUntil] = useState(initial?.availableUntil ?? '');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [photos, setPhotos] = useState<QueuedPhoto[]>([]);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -30,7 +34,7 @@ export function ToolForm({ initial, submitLabel, onSubmit }: Props) {
         visibility,
         availableFrom,
         availableUntil,
-      });
+      }, photos);
     } catch (err) {
       setError(errorMessage(err));
     } finally {
@@ -100,6 +104,8 @@ export function ToolForm({ initial, submitLabel, onSubmit }: Props) {
           style={{ display: 'block' }}
         />
       </label>
+
+      <PhotoFields photos={photos} onChange={setPhotos} max={maxNewPhotos} />
 
       {error && <p role="alert" style={{ color: '#b91c1c', margin: 0 }}>{error}</p>}
 

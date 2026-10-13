@@ -15,4 +15,5 @@ public record ToolDto(
     DateTime CreatedAt,
     string? BorrowerName = null,
     MembershipStatus? MyMembershipStatus = null,
-    MyLoanDto? MyLoan = null);
+    MyLoanDto? MyLoan = null,
+    IReadOnlyList<ToolPhotoDto>? Photos = null);

@@ -10,6 +10,7 @@ services:
       Jwt__Key: ${JWT_KEY:?Set JWT_KEY in a .env file next to docker-compose.yml}
       Jwt__Issuer: GardenToolSharing
       Jwt__Audience: GardenToolSharing
+      Uploads__Path: /data/uploads
     volumes:
       - tools-data:/data
 
@@ -24,5 +25,7 @@ services:
     depends_on:
       - api
 
+
 volumes:
   tools-data:
+

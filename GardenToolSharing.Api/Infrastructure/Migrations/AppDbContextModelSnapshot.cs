@@ -135,6 +135,40 @@ namespace GardenToolSharing.Api.Infrastructure.Migrations
                     b.ToTable("Tools");
                 });
 
+            modelBuilder.Entity("GardenToolSharing.Api.Models.ToolPhoto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Caption")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("StoredFileName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ToolId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ToolId");
+
+                    b.ToTable("ToolPhotos");
+                });
+
             modelBuilder.Entity("GardenToolSharing.Api.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -216,11 +250,24 @@ namespace GardenToolSharing.Api.Infrastructure.Migrations
                     b.Navigation("Owner");
                 });
 
+            modelBuilder.Entity("GardenToolSharing.Api.Models.ToolPhoto", b =>
+                {
+                    b.HasOne("GardenToolSharing.Api.Models.Tool", "Tool")
+                        .WithMany("Photos")
+                        .HasForeignKey("ToolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tool");
+                });
+
             modelBuilder.Entity("GardenToolSharing.Api.Models.Tool", b =>
                 {
                     b.Navigation("Loans");
 
                     b.Navigation("Memberships");
+
+                    b.Navigation("Photos");
                 });
 
             modelBuilder.Entity("GardenToolSharing.Api.Models.User", b =>

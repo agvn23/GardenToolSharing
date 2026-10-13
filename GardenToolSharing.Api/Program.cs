@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using GardenToolSharing.Api.Infrastructure.Storage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -84,6 +85,16 @@ builder.Services.AddRateLimiter(options =>
             Window = TimeSpan.FromMinutes(1),
             QueueLimit = 0
         }));
+
+    // Photo uploads and deletes: a tool with its photos would blow through the 5-a-minute default
+    options.AddPolicy("photo-write", httpContext => RateLimitPartition.GetFixedWindowLimiter(
+        httpContext.GetRateLimitPartitionKey(),
+        _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 20,
+            Window = TimeSpan.FromMinutes(1),
+            QueueLimit = 0
+        }));
 });
 
 // Override in Docker/Azure with the env var ConnectionStrings__Default
@@ -132,6 +143,10 @@ builder.Services.AddScoped<ILoanService, LoanService>();
 builder.Services.AddScoped<ILeaderboardRepository, LeaderboardRepository>();
 builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
 builder.Services.AddScoped<DbSeeder>();
+
+builder.Services.AddSingleton<IPhotoStorage, DiskPhotoStorage>();
+builder.Services.AddScoped<IToolPhotoRepository, ToolPhotoRepository>();
+builder.Services.AddScoped<IToolPhotoService, ToolPhotoService>();
 
 var app = builder.Build();
 
