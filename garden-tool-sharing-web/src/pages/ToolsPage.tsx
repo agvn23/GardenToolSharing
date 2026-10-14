@@ -130,7 +130,7 @@ async function handleCancelLoan(tool: Tool) {
             const isOwner = user?.id === tool.ownerId;
             return (
             <li key={tool.id} style={{ marginBottom: '1rem' }}>
-                <strong>{tool.name}</strong> ({statusLabel(tool)}) owned by {tool.ownerName}
+                <strong>{tool.name}</strong> ({statusLabel(tool, user?.id)}) owned by {tool.ownerName}
                 <br />
                 Available {tool.availableFrom} to {tool.availableUntil}
                 {tool.description && <p style={{ margin: '0.25rem 0' }}>{tool.description}</p>}
