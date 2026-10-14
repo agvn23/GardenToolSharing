@@ -73,11 +73,13 @@ export function EditToolPage() {
           try {
             await uploadQueuedPhotos(tool.id, photos);
           } catch (err) {
-            throw new Error(`Details saved, but a photo didn't upload: ${errorMessage(err)}. Reload the page to see which photos made it.`);
-          }
+            throw new Error(
+                `Details saved, but a photo didn't upload: ${errorMessage(err)}. Reload the page to see which photos made it.`,
+                { cause: err },
+            );
           navigate('/tools');
         }}
-      />
+    }/>
       <p><Link to="/tools">Cancel</Link></p>
     </section>
   );
