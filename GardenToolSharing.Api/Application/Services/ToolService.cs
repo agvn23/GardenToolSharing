@@ -151,6 +151,7 @@ public class ToolService(IToolRepository tools, TimeProvider time) : IToolServic
             canSeeBorrower ? activeLoan!.Borrower.DisplayName : null,
             myMembership?.Status,
             myLoan,
-            photos);
+            photos,
+            myMembership?.Id);
     }
 }

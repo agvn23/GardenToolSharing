@@ -16,4 +16,5 @@ public record ToolDto(
     string? BorrowerName = null,
     MembershipStatus? MyMembershipStatus = null,
     MyLoanDto? MyLoan = null,
-    IReadOnlyList<ToolPhotoDto>? Photos = null);
+    IReadOnlyList<ToolPhotoDto>? Photos = null,
+    int? MyMembershipId = null);
