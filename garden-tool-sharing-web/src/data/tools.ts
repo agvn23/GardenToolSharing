@@ -19,6 +19,7 @@ export interface Tool {
   myMembershipStatus: 'Pending' | 'Active' | null;
   myLoan: MyLoan | null;
   photos: ToolPhoto[] | null;
+  myMembershipId: number | null;
 }
 
 export function getTools(options: { mine?: boolean } = {}): Promise<Tool[]> {

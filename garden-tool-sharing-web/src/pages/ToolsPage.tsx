@@ -10,6 +10,8 @@ import { cancelLoan } from '../data/loans';
 import { removeTool } from '../data/tools';
 import { requestAccess } from '../data/memberships';
 import { PhotoGallery } from '../components/PhotoGallery'
+import { cancelMembership } from '../data/memberships'
+
 
 export function ToolsPage() {
   const { user } = useAuth();
@@ -68,6 +70,18 @@ export function ToolsPage() {
         setActionError(errorMessage(err));
     }
   }
+
+  async function handleCancelRequest(tool: Tool) {
+    if (tool.myMembershipId === null) return;
+    if (!window.confirm(`Cancel your request to borrow ${tool.name}?`)) return;
+    setActionError(null);
+    try {
+      await cancelMembership(tool.myMembershipId);
+      setReloadKey((k) => k + 1);
+  } catch (err) {
+    setActionError(errorMessage(err));
+  }
+}
 
   async function handleRemove(tool: Tool) {
     if (!window.confirm(`Remove ${tool.name}? It will be hidden from everyone until you restore it from Hidden tools.`)) return;
@@ -193,6 +207,11 @@ async function handleCancelLoan(tool: Tool) {
                         onCancel={() => setBorrowingId(null)}
                     />
                 )}
+
+                {tool.myMembershipStatus === 'Pending' && tool.myMembershipId !== null && (
+                  <button onClick={() => handleCancelRequest(tool)}>Cancel request</button>
+                )}
+
             </li>
             );
           })}

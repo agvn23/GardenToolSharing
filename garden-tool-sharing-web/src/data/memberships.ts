@@ -25,3 +25,7 @@ export function requestAccess(toolId: number): Promise<Membership> {
 export function declineMembership(id: number): Promise<void> {
   return apiFetch<void>(`/memberships/${id}`, { method: 'DELETE' });
 }
+
+export function cancelMembership(id: number): Promise<void> {
+  return apiFetch<void>(`/memberships/${id}`, { method: 'DELETE' });
+}
