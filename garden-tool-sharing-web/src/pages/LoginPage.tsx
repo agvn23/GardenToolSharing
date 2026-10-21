@@ -1,5 +1,5 @@
 import { useState, type CSSProperties, type FormEvent } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ApiError } from '../utils/problemDetails';
 
@@ -68,6 +68,9 @@ if (user) return <Navigate to={from} replace />;
         <button type="submit" disabled={isSubmitting} style={styles.button}>
           {isSubmitting ? 'Logging in…' : 'Log in'}
         </button>
+        <p style={{ margin: 0, fontSize: '0.875rem' }}>
+          No account yet? <Link to="/register">Create one</Link>
+        </p>
       </form>
     </div>
   );
