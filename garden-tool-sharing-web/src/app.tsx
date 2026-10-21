@@ -9,6 +9,7 @@ import { RequestsPage } from './pages/RequestsPage';
 import { RequestAccessPage } from './pages/RequestAccessPage';
 import { HiddenToolsPage } from './pages/HiddenToolsPage';
 import { EditToolPage } from './pages/EditToolPage';
+import { RegisterPage } from './pages/RegisterPage';
 
 
 // Temporary stand-in for "/" until the Dashboard slice replaces it - proves the full
@@ -19,6 +20,7 @@ export function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
       <Route element={<AuthGuard />}>
         <Route element={<RootLayout />}>
           <Route path="/" element={<Navigate to="/tools" replace />} />

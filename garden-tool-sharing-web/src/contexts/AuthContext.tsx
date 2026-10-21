@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { apiFetch } from '../utils/api';
 import { getStoredToken, setStoredToken, clearStoredToken } from '../utils/authStorage';
 import type { User } from '../types/user';
-import type { AuthResponse, LoginRequest } from '../types/auth';
+import type { AuthResponse, LoginRequest, RegisterRequest } from '../types/auth';
 
 interface AuthContextValue {
   user: User | null;
@@ -12,6 +12,7 @@ interface AuthContextValue {
   isLoading: boolean;
   login: (credentials: LoginRequest) => Promise<void>;
   logout: () => void;
+  register: (details: RegisterRequest) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -51,6 +52,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(response.user);
   }
 
+  async function register(details: RegisterRequest) {
+    const response = await apiFetch<AuthResponse>('/auth/register', {
+      method: 'POST',
+      body: details,
+    });
+    setStoredToken(response.token);
+    setToken(response.token);
+    setUser(response.user);
+  }
+
   function logout() {
     clearStoredToken();
     setToken(null);
@@ -58,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, token, isLoading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
