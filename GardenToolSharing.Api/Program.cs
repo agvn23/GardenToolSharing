@@ -148,6 +148,9 @@ builder.Services.AddSingleton<IPhotoStorage, DiskPhotoStorage>();
 builder.Services.AddScoped<IToolPhotoRepository, ToolPhotoRepository>();
 builder.Services.AddScoped<IToolPhotoService, ToolPhotoService>();
 
+builder.Services.AddScoped<INoticeRepository, NoticeRepository>();
+builder.Services.AddScoped<INoticeService, NoticeService>();
+
 var app = builder.Build();
 
 app.UseExceptionHandler();
@@ -185,5 +188,6 @@ api.MapToolEndpoints();
 api.MapMembershipEndpoints();
 api.MapLoanEndpoints();
 api.MapLeaderboardEndpoints();
+api.MapNoticeEndpoints();
 
 app.Run();
