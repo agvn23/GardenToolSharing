@@ -10,6 +10,8 @@ import { RequestAccessPage } from './pages/RequestAccessPage';
 import { HiddenToolsPage } from './pages/HiddenToolsPage';
 import { EditToolPage } from './pages/EditToolPage';
 import { RegisterPage } from './pages/RegisterPage';
+import { NoticeBoardPage } from './pages/NoticeBoardPage';
+import { NoticePage } from './pages/NoticePage';
 
 
 // Temporary stand-in for "/" until the Dashboard slice replaces it - proves the full
@@ -31,6 +33,8 @@ export function App() {
           <Route path="/tools/:id/request" element={<RequestAccessPage />} />
           <Route path="/tools/hidden" element={<HiddenToolsPage />} />
           <Route path="/tools/:id/edit" element={<EditToolPage />} />
+          <Route path="/notices" element={<NoticeBoardPage />} />
+          <Route path="/notices/:id" element={<NoticePage />} />
         </Route>
       </Route>
       <Route path="*" element={<Navigate to="/tools" replace />} />

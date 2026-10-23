@@ -11,6 +11,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Membership> Memberships => Set<Membership>();
     public DbSet<Loan> Loans => Set<Loan>();
     public DbSet<ToolPhoto> ToolPhotos => Set<ToolPhoto>();
+    public DbSet<Notice> Notices => Set<Notice>();
+    public DbSet<NoticeComment> NoticeComments => Set<NoticeComment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) =>
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);

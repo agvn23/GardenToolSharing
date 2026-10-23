@@ -86,6 +86,66 @@ namespace GardenToolSharing.Api.Infrastructure.Migrations
                     b.ToTable("Memberships");
                 });
 
+            modelBuilder.Entity("GardenToolSharing.Api.Models.Notice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.ToTable("Notices");
+                });
+
+            modelBuilder.Entity("GardenToolSharing.Api.Models.NoticeComment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("NoticeId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("NoticeId");
+
+                    b.ToTable("NoticeComments");
+                });
+
             modelBuilder.Entity("GardenToolSharing.Api.Models.Tool", b =>
                 {
                     b.Property<int>("Id")
@@ -239,6 +299,36 @@ namespace GardenToolSharing.Api.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("GardenToolSharing.Api.Models.Notice", b =>
+                {
+                    b.HasOne("GardenToolSharing.Api.Models.User", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+                });
+
+            modelBuilder.Entity("GardenToolSharing.Api.Models.NoticeComment", b =>
+                {
+                    b.HasOne("GardenToolSharing.Api.Models.User", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GardenToolSharing.Api.Models.Notice", "Notice")
+                        .WithMany("Comments")
+                        .HasForeignKey("NoticeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("Notice");
+                });
+
             modelBuilder.Entity("GardenToolSharing.Api.Models.Tool", b =>
                 {
                     b.HasOne("GardenToolSharing.Api.Models.User", "Owner")
@@ -259,6 +349,11 @@ namespace GardenToolSharing.Api.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Tool");
+                });
+
+            modelBuilder.Entity("GardenToolSharing.Api.Models.Notice", b =>
+                {
+                    b.Navigation("Comments");
                 });
 
             modelBuilder.Entity("GardenToolSharing.Api.Models.Tool", b =>
